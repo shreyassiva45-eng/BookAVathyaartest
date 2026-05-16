@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#FF9933">
+    <title>Book a Vaathyaar | Spiritual Services</title>
+    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register("{{ url_for('static', filename='service-worker.js') }}");
+            });
+        }
+    </script>
+    {% block head %}{% endblock %}
+</head>
+<body>
+    <nav>
+        <a href="{{ url_for('index') }}" class="logo">
+            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Book a Vaathyaar" style="height: 40px; border-radius: 10px;">
+            Book a Vaathyaar
+        </a>
+        <div class="nav-links">
+            {% if current_user.is_authenticated %}
+                {% if current_user.role == 'normal' %}
+                    <a href="{{ url_for('normal_dashboard') }}">Discover</a>
+                    <a href="{{ url_for('my_bookings') }}">My Bookings</a>
+                {% else %}
+                    <a href="{{ url_for('priest_dashboard') }}">My Schedule</a>
+                {% endif %}
+                <a href="{{ url_for('logout') }}" class="btn btn-ghost" style="padding: 0.5rem 1rem; font-size: 0.85rem;">Logout</a>
+            {% else %}
+                <a href="{{ url_for('auth_portal') }}" class="btn btn-primary" style="padding: 0.5rem 1.5rem; font-size: 0.85rem;">Get Started</a>
+            {% endif %}
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="alerts">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert {{ category }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+        </div>
+        
+        {% block content %}{% endblock %}
+    </div>
+
+    {% block scripts %}{% endblock %}
+</body>
+</html>
+

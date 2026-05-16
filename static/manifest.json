@@ -1,0 +1,17 @@
+{
+  "name": "Book a Vaathyaar",
+  "short_name": "Vaathyaar",
+  "description": "Connect with professional priests for all your spiritual needs.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#121212",
+  "theme_color": "#ff9800",
+  "icons": [
+    {
+      "src": "/static/images/logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

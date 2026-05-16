@@ -1,0 +1,175 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="hero fade-in">
+    <div class="hero-content">
+        <h1>Welcome, Acharya {{ current_user.name }}</h1>
+        <p style="color: rgba(255,255,255,0.8); font-size: 1.1rem; margin-bottom: 2rem;">Your dedication to dharma brings peace to many. Manage your upcoming rituals here.</p>
+        
+        <div style="display: flex; gap: 2rem; justify-content: center; margin-top: 2rem;">
+            <div class="glass" style="padding: 1rem 2rem; text-align: center;">
+                <div style="font-size: 1.5rem; font-weight: 700; color: var(--primary);">₹{{ bookings|selectattr('is_finished')|sum(attribute='amount')|int }}</div>
+                <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Total Earnings</div>
+            </div>
+            <div class="glass" style="padding: 1rem 2rem; text-align: center;">
+                <div style="font-size: 1.5rem; font-weight: 700; color: var(--accent);">{{ bookings|selectattr('is_finished')|list|length }}</div>
+                <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Rituals Completed</div>
+            </div>
+            <div class="glass" style="padding: 1rem 2rem; text-align: center;">
+                <div style="font-size: 1.5rem; font-weight: 700; color: var(--success);">4.9★</div>
+                <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Client Rating</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="dashboard-grid">
+    <!-- Incoming Requests -->
+    <div class="fade-in" style="animation-delay: 0.1s;">
+        <h2 class="column-header" style="color: var(--primary);">New Requests</h2>
+        {% for b in bookings if b.status == 'awaiting' %}
+        <div class="card glass" style="margin-bottom: 1.5rem; border-left: 4px solid var(--primary);">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+                <div>
+                    <h3 style="margin: 0; font-size: 1.1rem;">{{ b.normal_user.name }}</h3>
+                    <span class="badge badge-awaiting">Pending Approval</span>
+                </div>
+                <div style="text-align: right;">
+                    <div style="font-weight: 700; color: var(--success); font-size: 1.2rem;">₹{{ b.amount }}</div>
+                </div>
+            </div>
+            <div style="font-size: 0.9rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 1.5rem;">
+                <div style="display: flex; gap: 0.5rem;">📅 <span>{{ b.date }}</span></div>
+                <div style="display: flex; gap: 0.5rem;">🕯️ <span>{{ b.ritual }}</span></div>
+                <div style="display: flex; gap: 0.5rem;">📍 <span>{{ b.location_address }}</span></div>
+            </div>
+            <form method="POST" action="{{ url_for('update_booking_status', booking_id=b.id) }}" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <button type="submit" name="action" value="accept" class="btn btn-primary">Accept</button>
+                <button type="submit" name="action" value="reject" class="btn btn-ghost">Decline</button>
+            </form>
+        </div>
+        {% else %}
+        <div class="card glass" style="text-align: center; padding: 2rem;">
+            <p style="color: var(--text-muted);">No new requests.</p>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Confirmed Gigs -->
+    <div class="fade-in" style="animation-delay: 0.2s;">
+        <h2 class="column-header" style="color: var(--success);">Upcoming Gigs</h2>
+        {% for b in bookings if b.status == 'confirmed' %}
+        <div class="card glass" style="margin-bottom: 1.5rem; border-left: 4px solid var(--success);">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+                <h3 style="margin: 0; font-size: 1.1rem;">{{ b.normal_user.name }}</h3>
+                <span class="badge badge-confirmed">Confirmed</span>
+            </div>
+            
+            <div style="font-size: 0.9rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 1.5rem;">
+                <div style="display: flex; gap: 0.5rem;">📅 <span>{{ b.date }}</span></div>
+                <div style="display: flex; gap: 0.5rem;">🕯️ <span>{{ b.ritual }}</span></div>
+                <div style="display: flex; gap: 0.5rem;">📍 <span>{{ b.location_address }}</span></div>
+            </div>
+
+            {% if not b.is_finished %}
+                <form method="POST" action="{{ url_for('track_booking', booking_id=b.id) }}">
+                    {% if b.tracking_status == 'not_started' %}
+                        <button type="submit" name="tracking_action" value="start" class="btn btn-primary" style="width: 100%; margin-bottom: 0.5rem;">
+                            🚀 Start Journey
+                        </button>
+                        <button type="button" class="btn btn-ghost" style="width: 100%; color: var(--danger);" onclick="confirmReject('{{ b.id }}')">
+                            Cancel Gig
+                        </button>
+                    {% elif b.tracking_status == 'started' %}
+                        <button type="submit" name="tracking_action" value="reached" class="btn btn-primary" style="width: 100%;">
+                            📍 I have Reached
+                        </button>
+                    {% elif b.tracking_status == 'reached' %}
+                        <div class="form-group" style="margin-bottom: 0.5rem;">
+                            <input type="text" name="otp" class="form-control" placeholder="Enter OTP from Client" required>
+                        </div>
+                        <button type="submit" name="tracking_action" value="verify_otp" class="btn btn-primary" style="width: 100%;">
+                            ✨ Verify & Start Ritual
+                        </button>
+                    {% endif %}
+                </form>
+            {% elif b.tracking_status == 'verified' and not b.is_finished %}
+                <div class="alert success" style="margin: 0; padding: 1rem; font-size: 0.9rem;">
+                    🪔 Ritual in Progress...
+                </div>
+            {% else %}
+                <div class="alert success" style="margin: 0; padding: 1rem; font-size: 0.9rem;">
+                    ✅ Completed
+                </div>
+            {% endif %}
+        </div>
+        {% else %}
+        <div class="card glass" style="text-align: center; padding: 2rem;">
+            <p style="color: var(--text-muted);">No upcoming gigs.</p>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- History -->
+    <div class="fade-in" style="animation-delay: 0.3s;">
+        <h2 class="column-header" style="color: var(--accent);">Recent History</h2>
+        {% for b in bookings if b.status in ['rejected', 'confirmed'] and (b.is_finished or b.status == 'rejected') %}
+        <div class="card glass" style="margin-bottom: 1rem; opacity: 0.7;">
+            <div style="display: flex; justify-content: space-between;">
+                <strong style="font-size: 0.9rem;">{{ b.normal_user.name }}</strong>
+                {% if b.status == 'rejected' %}
+                    <span class="badge badge-rejected">Cancelled</span>
+                {% else %}
+                    <span class="badge badge-confirmed">Finished</span>
+                {% endif %}
+            </div>
+            <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.5rem;">
+                {{ b.ritual }} | {{ b.date }}
+            </p>
+        </div>
+        {% else %}
+        <div class="card glass" style="text-align: center; padding: 2rem;">
+            <p style="color: var(--text-muted);">No history yet.</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<form id="hidden-reject-form" method="POST" style="display:none;">
+    <input type="hidden" name="action" value="reject">
+</form>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function confirmReject(bookingId) {
+        if(confirm("Are you sure you want to cancel this gig?")) {
+            var form = document.getElementById('hidden-reject-form');
+            form.action = "{{ url_for('update_booking_status', booking_id=0) }}".replace('0', bookingId);
+            form.submit();
+        }
+    }
+
+    let watchId = null;
+    function startTracking(bookingId) {
+        if ("geolocation" in navigator) {
+            watchId = navigator.geolocation.watchPosition((position) => {
+                const lat = position.coords.latitude;
+                const lng = position.coords.longitude;
+                fetch(`/booking/${bookingId}/update_location`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ lat, lng })
+                });
+            }, null, { enableHighAccuracy: true });
+        }
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+        {% for b in bookings if b.tracking_status == 'started' %}
+            startTracking('{{ b.id }}');
+        {% endfor %}
+    });
+</script>
+{% endblock %}
+

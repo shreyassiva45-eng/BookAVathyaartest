@@ -1,0 +1,215 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="hero fade-in">
+    <div class="hero-content">
+        <h1>Your Sacred Journey</h1>
+        <p style="color: rgba(255,255,255,0.8); font-size: 1.1rem; margin-bottom: 2rem;">Track your ritual status and stay connected with your priest.</p>
+    </div>
+</div>
+
+<div class="dashboard-grid">
+    <!-- Awaiting Column -->
+    <div class="fade-in" style="animation-delay: 0.1s;">
+        <h2 class="column-header" style="color: var(--primary);">Pending Confirmation</h2>
+        {% for b in bookings if b.status == 'awaiting' %}
+        <div class="card glass" style="margin-bottom: 1.5rem; border-left: 4px solid var(--primary);">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+                <h3 style="margin: 0; font-size: 1.1rem;">{{ b.priest.name }}</h3>
+                <span class="badge badge-awaiting">Awaiting</span>
+            </div>
+            <div style="font-size: 0.9rem; color: var(--text-muted); line-height: 1.6;">
+                <div style="display: flex; gap: 0.5rem;">📅 <span>{{ b.date }}</span></div>
+                <div style="display: flex; gap: 0.5rem;">🕯️ <span>{{ b.ritual }}</span></div>
+            </div>
+        </div>
+        {% else %}
+        <div class="card glass" style="text-align: center; padding: 2rem;">
+            <p style="color: var(--text-muted);">No pending requests.</p>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Confirmed Column -->
+    <div class="fade-in" style="animation-delay: 0.2s;">
+        <h2 class="column-header" style="color: var(--success);">Confirmed Gigs</h2>
+        {% for b in bookings if b.status == 'confirmed' %}
+        <div class="card glass" style="margin-bottom: 1.5rem; border-left: 4px solid var(--success);">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+                <h3 style="margin: 0; font-size: 1.1rem;">{{ b.priest.name }}</h3>
+                <span class="badge badge-confirmed">Confirmed</span>
+            </div>
+            
+            <div style="font-size: 0.9rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 1.5rem;">
+                <div style="display: flex; gap: 0.5rem;">📅 <span>{{ b.date }}</span></div>
+                <div style="display: flex; gap: 0.5rem;">🕯️ <span>{{ b.ritual }}</span></div>
+            </div>
+
+            <div class="glass" style="padding: 1.25rem; background: rgba(0, 230, 118, 0.05); border-radius: 12px;">
+                {% if not b.is_finished %}
+                    {% if b.tracking_status == 'not_started' %}
+                        <p style="margin: 0; font-size: 0.85rem; color: var(--text-muted); text-align: center;">
+                            Waiting for the priest to start the journey.
+                        </p>
+                    {% elif b.tracking_status == 'started' %}
+                        <div style="text-align: center;">
+                            <p style="color: var(--accent); font-weight: 700; margin-bottom: 1rem;">🛺 Priest is on the way!</p>
+                            <button class="btn btn-primary" style="width: 100%;" onclick="openTrackingModal('{{ b.id }}')">
+                                Track Live Location
+                            </button>
+                        </div>
+                    {% elif b.tracking_status == 'reached' %}
+                        <div style="text-align: center;">
+                            <p style="color: var(--success); font-weight: 700; margin-bottom: 0.5rem;">📍 Priest has arrived!</p>
+                            <div class="glass" style="display: inline-block; padding: 0.5rem 1.5rem; font-size: 1.5rem; font-weight: 800; color: var(--primary); letter-spacing: 4px; margin-bottom: 1rem;">
+                                {{ b.otp }}
+                            </div>
+                            <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 1rem;">Share this OTP to start the ritual.</p>
+                            <button class="btn btn-primary" style="width: 100%;" onclick="openReviewModal('{{ b.id }}')">
+                                Complete & Review
+                            </button>
+                        </div>
+                    {% endif %}
+                {% else %}
+                    <div style="text-align: center;">
+                        <p style="color: var(--success); font-weight: 700;">✅ Ritual Completed</p>
+                        {% if b.rating %}
+                            <div style="color: var(--accent); font-size: 0.9rem; margin-top: 0.5rem;">Rated: {{ b.rating }}★</div>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        {% else %}
+        <div class="card glass" style="text-align: center; padding: 2rem;">
+            <p style="color: var(--text-muted);">No confirmed bookings yet.</p>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- History Column -->
+    <div class="fade-in" style="animation-delay: 0.3s;">
+        <h2 class="column-header" style="color: var(--accent);">History</h2>
+        {% for b in bookings if b.status == 'rejected' or b.is_finished %}
+        <div class="card glass" style="margin-bottom: 1rem; opacity: 0.7;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <strong style="font-size: 0.9rem;">{{ b.priest.name }}</strong>
+                {% if b.status == 'rejected' %}
+                    <span class="badge badge-rejected">Cancelled</span>
+                {% else %}
+                    <span class="badge badge-confirmed">Finished</span>
+                {% endif %}
+            </div>
+            <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.5rem;">
+                {{ b.ritual }} | {{ b.date }}
+            </p>
+        </div>
+        {% else %}
+        <div class="card glass" style="text-align: center; padding: 2rem;">
+            <p style="color: var(--text-muted);">No booking history.</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Review Modal -->
+<div class="modal-overlay" id="review-modal">
+    <div class="modal glass fade-in" style="max-width: 450px;">
+        <div class="modal-header">
+            <h3>Share Your Experience</h3>
+            <button class="close-modal" onclick="closeModal()">×</button>
+        </div>
+        <form id="review-form" method="POST" action="" style="padding: 2rem;">
+            <div class="form-group">
+                <label>How would you rate the service?</label>
+                <select name="rating" class="form-control" required>
+                    <option value="5">⭐⭐⭐⭐⭐ Excellent</option>
+                    <option value="4">⭐⭐⭐⭐ Very Good</option>
+                    <option value="3">⭐⭐⭐ Good</option>
+                    <option value="2">⭐⭐ Fair</option>
+                    <option value="1">⭐ Poor</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Your Feedback</label>
+                <textarea name="review" class="form-control" rows="3" placeholder="Share a few words about the experience..."></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary" style="width: 100%; font-size: 1.1rem; padding: 1.25rem;">
+                Submit & Close Booking
+            </button>
+        </form>
+    </div>
+</div>
+
+<!-- Tracking Modal -->
+<div class="modal-overlay" id="tracking-modal">
+    <div class="modal glass fade-in" style="max-width: 800px; height: 80vh; display: flex; flex-direction: column;">
+        <div class="modal-header">
+            <h3>Live Priest Tracking</h3>
+            <button class="close-modal" onclick="closeModal()">×</button>
+        </div>
+        <div id="map-container" style="flex: 1; width: 100%; min-height: 400px; background: #eee;"></div>
+        <div style="padding: 1.5rem; background: rgba(0,0,0,0.2); text-align: center;">
+            <p style="margin: 0; font-size: 0.9rem; color: var(--text-muted);">
+                ✨ The priest's location is being updated live.
+            </p>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+    let map = null;
+    let priestMarker = null;
+    let trackInterval = null;
+
+    function openReviewModal(bookingId) {
+        document.getElementById('review-form').action = "{{ url_for('finish_booking', booking_id=0) }}".replace('0', bookingId);
+        document.getElementById('review-modal').classList.add('active');
+    }
+
+    function openTrackingModal(bookingId) {
+        document.getElementById('tracking-modal').classList.add('active');
+        
+        // Initialize Map with slight delay to ensure modal is visible
+        setTimeout(() => {
+            if (!map) {
+                map = L.map('map-container').setView([20.5937, 78.9629], 5);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+            }
+            map.invalidateSize(); // Force map to recalculate size in modal
+            updateLocation();
+        }, 300);
+
+        if (trackInterval) clearInterval(trackInterval);
+        
+        const updateLocation = () => {
+            fetch(`/booking/${bookingId}/get_location`)
+                .then(r => r.json())
+                .then(data => {
+                    if (data.lat && data.lng) {
+                        const pos = [data.lat, data.lng];
+                        if (!priestMarker) {
+                            priestMarker = L.marker(pos).addTo(map);
+                            map.setView(pos, 15);
+                        } else {
+                            priestMarker.setLatLng(pos);
+                        }
+                    }
+                });
+        };
+
+        trackInterval = setInterval(updateLocation, 5000);
+    }
+
+    function closeModal() {
+        document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('active'));
+        if (trackInterval) clearInterval(trackInterval);
+    }
+</script>
+{% endblock %}
+
