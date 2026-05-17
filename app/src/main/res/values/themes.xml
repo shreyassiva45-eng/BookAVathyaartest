@@ -2,4 +2,8 @@
 <resources>
 
     <style name="Theme.BookAVaathyaar" parent="android:Theme.Material.Light.NoActionBar" />
+
+    <style name="Theme.VathyaarAppTest" parent="android:Theme.Material.Light.NoActionBar" />
+
+    <style name="Theme.BookAVathyaar" parent="android:Theme.Material.Light.NoActionBar" />
 </resources>
