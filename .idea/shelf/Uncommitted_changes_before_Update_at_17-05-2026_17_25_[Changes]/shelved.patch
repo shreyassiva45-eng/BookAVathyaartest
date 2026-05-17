@@ -1,0 +1,60 @@
+Index: app/build.gradle.kts
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>plugins {\r\n    alias(libs.plugins.android.application)\r\n    alias(libs.plugins.kotlin.compose)\r\n}\r\n\r\nandroid {\r\n    namespace = \"com.example.bookavaathyaar\"\r\n    compileSdk = 37\r\n\r\n    defaultConfig {\r\n        applicationId = \"com.example.bookavaathyaar\"\r\n        minSdk = 24\r\n        targetSdk = 37\r\n        versionCode = 1\r\n        versionName = \"1.0\"\r\n\r\n        testInstrumentationRunner = \"androidx.test.runner.AndroidJUnitRunner\"\r\n    }\r\n\r\n    buildTypes {\r\n        release {\r\n            isMinifyEnabled = false\r\n            proguardFiles(\r\n                getDefaultProguardFile(\"proguard-android-optimize.txt\"),\r\n                \"proguard-rules.pro\"\r\n            )\r\n        }\r\n    }\r\n    compileOptions {\r\n        sourceCompatibility = JavaVersion.VERSION_11\r\n        targetCompatibility = JavaVersion.VERSION_11\r\n    }\r\n    buildFeatures {\r\n        compose = true\r\n    }\r\n}\r\n\r\ndependencies {\r\n    implementation(\"com.squareup.okhttp3:okhttp:4.12.0\")\r\n    implementation(platform(libs.androidx.compose.bom))\r\n    implementation(libs.androidx.activity.compose)\r\n    implementation(libs.androidx.compose.material3)\r\n    implementation(libs.androidx.compose.ui)\r\n    implementation(libs.androidx.compose.ui.graphics)\r\n    implementation(libs.androidx.compose.ui.tooling.preview)\r\n    implementation(libs.androidx.core.ktx)\r\n    implementation(libs.androidx.lifecycle.runtime.ktx)\r\n    testImplementation(libs.junit)\r\n    androidTestImplementation(platform(libs.androidx.compose.bom))\r\n    androidTestImplementation(libs.androidx.compose.ui.test.junit4)\r\n    androidTestImplementation(libs.androidx.espresso.core)\r\n    androidTestImplementation(libs.androidx.junit)\r\n    debugImplementation(libs.androidx.compose.ui.test.manifest)\r\n    debugImplementation(libs.androidx.compose.ui.tooling)\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/build.gradle.kts b/app/build.gradle.kts
+--- a/app/build.gradle.kts	(revision ea94db2f8b0c42887bb8b49f497c2e7eaa3bf484)
++++ b/app/build.gradle.kts	(date 1779018534352)
+@@ -5,12 +5,12 @@
+ 
+ android {
+     namespace = "com.example.bookavaathyaar"
+-    compileSdk = 37
++    compileSdk = 35
+ 
+     defaultConfig {
+         applicationId = "com.example.bookavaathyaar"
+         minSdk = 24
+-        targetSdk = 37
++        targetSdk = 35
+         versionCode = 1
+         versionName = "1.0"
+ 
+Index: gradle/libs.versions.toml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>[versions]\r\nagp = \"9.2.1\"\r\ncoreKtx = \"1.10.1\"\r\njunit = \"4.13.2\"\r\njunitVersion = \"1.1.5\"\r\nespressoCore = \"3.5.1\"\r\nlifecycleRuntimeKtx = \"2.6.1\"\r\nactivityCompose = \"1.8.0\"\r\nkotlin = \"2.2.10\"\r\ncomposeBom = \"2026.02.01\"\r\n\r\n[libraries]\r\nandroidx-core-ktx = { group = \"androidx.core\", name = \"core-ktx\", version.ref = \"coreKtx\" }\r\njunit = { group = \"junit\", name = \"junit\", version.ref = \"junit\" }\r\nandroidx-junit = { group = \"androidx.test.ext\", name = \"junit\", version.ref = \"junitVersion\" }\r\nandroidx-espresso-core = { group = \"androidx.test.espresso\", name = \"espresso-core\", version.ref = \"espressoCore\" }\r\nandroidx-lifecycle-runtime-ktx = { group = \"androidx.lifecycle\", name = \"lifecycle-runtime-ktx\", version.ref = \"lifecycleRuntimeKtx\" }\r\nandroidx-activity-compose = { group = \"androidx.activity\", name = \"activity-compose\", version.ref = \"activityCompose\" }\r\nandroidx-compose-bom = { group = \"androidx.compose\", name = \"compose-bom\", version.ref = \"composeBom\" }\r\nandroidx-compose-ui = { group = \"androidx.compose.ui\", name = \"ui\" }\r\nandroidx-compose-ui-graphics = { group = \"androidx.compose.ui\", name = \"ui-graphics\" }\r\nandroidx-compose-ui-tooling = { group = \"androidx.compose.ui\", name = \"ui-tooling\" }\r\nandroidx-compose-ui-tooling-preview = { group = \"androidx.compose.ui\", name = \"ui-tooling-preview\" }\r\nandroidx-compose-ui-test-manifest = { group = \"androidx.compose.ui\", name = \"ui-test-manifest\" }\r\nandroidx-compose-ui-test-junit4 = { group = \"androidx.compose.ui\", name = \"ui-test-junit4\" }\r\nandroidx-compose-material3 = { group = \"androidx.compose.material3\", name = \"material3\" }\r\n\r\n[plugins]\r\nandroid-application = { id = \"com.android.application\", version.ref = \"agp\" }\r\nkotlin-compose = { id = \"org.jetbrains.kotlin.plugin.compose\", version.ref = \"kotlin\" }\r\n\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/gradle/libs.versions.toml b/gradle/libs.versions.toml
+--- a/gradle/libs.versions.toml	(revision ea94db2f8b0c42887bb8b49f497c2e7eaa3bf484)
++++ b/gradle/libs.versions.toml	(date 1779018180522)
+@@ -27,5 +27,6 @@
+ 
+ [plugins]
+ android-application = { id = "com.android.application", version.ref = "agp" }
++kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+ kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+ 
+Index: build.gradle.kts
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>// Top-level build file where you can add configuration options common to all sub-projects/modules.\r\nplugins {\r\n    alias(libs.plugins.android.application) apply false\r\n    alias(libs.plugins.kotlin.compose) apply false\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/build.gradle.kts b/build.gradle.kts
+--- a/build.gradle.kts	(revision ea94db2f8b0c42887bb8b49f497c2e7eaa3bf484)
++++ b/build.gradle.kts	(date 1779018180539)
+@@ -1,5 +1,6 @@
+ // Top-level build file where you can add configuration options common to all sub-projects/modules.
+ plugins {
+     alias(libs.plugins.android.application) apply false
++    alias(libs.plugins.kotlin.android) apply false
+     alias(libs.plugins.kotlin.compose) apply false
+ }
+\ No newline at end of file

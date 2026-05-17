@@ -1,8 +1,7 @@
-package com.example.bookavaathyaartest
+package com.example.bookavaathyaar
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import android.webkit.WebView
 import android.webkit.WebViewClient
