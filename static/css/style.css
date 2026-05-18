@@ -50,7 +50,7 @@ nav {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 1.25rem 5%;
+    padding: calc(1.25rem + env(safe-area-inset-top, 35px)) 5% 1.25rem;
     background: rgba(10, 10, 10, 0.8);
     backdrop-filter: blur(20px);
     border-bottom: 1px solid var(--glass-border);
@@ -376,9 +376,24 @@ nav .logo:hover {
 
 /* Mobile Adjustments */
 @media (max-width: 768px) {
-    .nav-links { display: none; }
+    .nav-links {
+        display: flex;
+        position: fixed;
+        bottom: 0; left: 0; right: 0;
+        background: rgba(10, 10, 10, 0.95);
+        padding: 1rem 5% calc(1rem + env(safe-area-inset-bottom, 10px));
+        justify-content: space-around;
+        border-top: 1px solid var(--glass-border);
+        backdrop-filter: blur(20px);
+        z-index: 1000;
+        gap: 0.5rem;
+    }
+    .nav-links a {
+        font-size: 0.85rem;
+        text-align: center;
+    }
     .hero h1 { font-size: 2.5rem; }
-    .container { padding: 1.5rem; }
+    .container { padding: 1.5rem; padding-bottom: 6rem; }
 }
 
 /* Modals & Overlays */

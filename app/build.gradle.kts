@@ -5,12 +5,12 @@ plugins {
 
 android {
     namespace = "com.example.bookavaathyaar"
-    compileSdk = 35
+    compileSdk = 37
 
     defaultConfig {
         applicationId = "com.example.bookavaathyaar"
-        minSdk = 26
-        targetSdk = 35
+        minSdk = 24
+        targetSdk = 37
         versionCode = 1
         versionName = "1.0"
 
